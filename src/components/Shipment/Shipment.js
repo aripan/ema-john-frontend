@@ -1,13 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import "./Shipment.css";
 import { useContext } from "react";
 import { UserContext } from "../../App";
 import { getDatabaseCart, processOrder } from "../../utilities/databaseManager";
+import Alert from "@material-ui/lab/Alert";
 
 const Shipment = () => {
   const { register, handleSubmit, watch, errors } = useForm();
   const [loggedInUser, setLoggedInUser] = useContext(UserContext);
+  const [successMessage, setSuccessMessage] = useState("");
   const onSubmit = (data) => {
     const savedCart = getDatabaseCart();
     const orderDetails = {
@@ -28,7 +30,9 @@ const Shipment = () => {
       .then((res) => res.json())
       .then((data) => {
         processOrder();
-        console.log(data);
+        if (data) {
+          setSuccessMessage("Order has been placed Successfully");
+        }
       });
   };
 
@@ -36,6 +40,7 @@ const Shipment = () => {
 
   return (
     <form className="ship-form" onSubmit={handleSubmit(onSubmit)}>
+      {successMessage && <Alert severity="success">{successMessage}</Alert>}
       <input
         name="name"
         defaultValue={loggedInUser.name}
